@@ -17,11 +17,17 @@ public abstract class Pieza extends JLabel{
     private int coordX;
     private int coordY;
     private ArrayList<Casilla> movimientosValidos= new ArrayList<>();
+    private boolean primerMovimiento = true;
     
     private int jugador;
 
 
-    
+    /*
+     * Constructor de la clase Pieza.
+     * @param casilla La casilla en la que se coloca la pieza.
+     * @param esBlancha Indica si la pieza es blanca (true) o negra (false).
+     */
+
     public Pieza(Casilla casilla, boolean esBlancha){
         
         ImagePieza i = (ImagePieza)ponerImagen(esBlancha);
@@ -48,14 +54,10 @@ public abstract class Pieza extends JLabel{
     public abstract ArrayList<Casilla> obtenerMovimientos();//AQUI SE DEBE USAR EL ARRAYLIST CREADO EN LA PIEZA
     
     public ArrayList<Casilla> getMovimientosValidos(){
-        
-        if(beenClicked){
-            return movimientosValidos;
-        }
-        movimientosValidos.clear();
-        movimientosValidos = obtenerMovimientos();
-        beenClicked = true;
         return movimientosValidos;
+    }
+    public void resetMovimientosValidos(){
+        movimientosValidos.clear();
     }
     
     public abstract String tipoPieza();
@@ -69,7 +71,11 @@ public abstract class Pieza extends JLabel{
     public boolean esAmigo(Pieza p){
         return this.getJugador() == p.getJugador();
     }
+
     public int detectarPiezaCasilla(Casilla c){
+        //Este metodo detecta si hay una pieza en la casilla y devuelve un entero
+        //1 si es pieza amiga, -1 si es enemiga y 0 si no hay nada en la casilla
+
         if(c.tengoPieza()){
             Pieza p = c.obtenerPieza();
             if(this.esAmigo(p)){
@@ -78,11 +84,10 @@ public abstract class Pieza extends JLabel{
             return -1;
         }
         return 0;
-        //Devuelve 1 si es pieza amiga, -1 si es enemiga y 0 si no hay nada en la casilla
     }
     
     public boolean agregarCasilla(int check, Casilla c,ArrayList<Casilla> listaCasillas){
-        
+
         if(check ==1){
             return true;
         }
@@ -96,26 +101,6 @@ public abstract class Pieza extends JLabel{
         return false;
         
     }
-    
-    /*public boolean addCasillaToLista(ArrayList<Casilla> casillas, Casilla c){
-        //ESTE METODO DEVUELVE TRUE SI LA CASILLA QUE ENTRA TIENE UNA PIEZA
-        //ESTE METODO TAMBIEN AÑADE A LA LISTA DE CASILLAS SI LA PIEZA ES ENEMIGA
-        
-        //DEVUELVE FALSE CASO CONTRARIO
-        //METODO DE MRDA XDDDD, NO FUNCIONARA CON REY Y PEON
-        
-        //ARREGLARE ESTE METODO CAGADA 20/05/25
-        if(c.tengoPieza()){
-            Pieza p = c.obtenerPieza();
-            if(this.esAmigo(p)){
-                return this.esAmigo(p);
-            }
-            casillas.add(c);
-            return true;
-        }
-        casillas.add(c);
-        return false;
-    }*/
     
     public boolean CanMove() {
         return canMove;
@@ -151,6 +136,25 @@ public abstract class Pieza extends JLabel{
 
     public int getCoordY() {
         return coordY;
+    }
+
+    public boolean getPrimerMovimiento() {
+        return primerMovimiento;
+    }
+    public void setPrimerMovimiento(boolean primerMovimiento) {
+        this.primerMovimiento = primerMovimiento;
+    }
+
+    public void moverA(Casilla destino) {
+        if(destino.obtenerPieza() != null){
+            // Es captura
+            destino.remove(destino.obtenerPieza());
+        }
+        this.setPrimerMovimiento(false);
+        Casilla origen = casillaActual;
+        origen.remove(this);
+        destino.add(this);
+        this.actualizarDatos(destino);
     }
 
     public void setCoordY(int coordY) {

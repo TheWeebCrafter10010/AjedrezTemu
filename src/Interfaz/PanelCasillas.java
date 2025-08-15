@@ -65,15 +65,31 @@ public class PanelCasillas extends JPanel{
     }
     
     public void agregarPieza(){
-        
-        piezasEnTablero.add(new Torre(casillas[0][0], true));
-        piezasEnTablero.add(new Alfil(casillas[4][4], false));
-        piezasEnTablero.add(new Caballo(casillas[7][7], true));
-        piezasEnTablero.add(new Reina(casillas[5][5], false));
-        piezasEnTablero.add(new Peon(casillas[2][7], false));
-        piezasEnTablero.add(new Peon(casillas[4][7], true));
-        piezasEnTablero.add(new Rey(casillas[1][2], true)); 
+        generarPiezas(true);
+        generarPiezas(false);
+        generarMovimietosPiezas();
     }
+
+private void generarPiezas(boolean blancas){
+    int filaPeones = blancas ? 6 : 1;
+    int filaMayores = blancas ? 7 : 0;
+
+    // Generar peones
+    for(int i = 0; i < 8; i++){
+        piezasEnTablero.add(new Peon(casillas[filaPeones][i], blancas));
+    }
+
+    // Generar piezas mayores
+    piezasEnTablero.add(new Torre(casillas[filaMayores][0], blancas));
+    piezasEnTablero.add(new Torre(casillas[filaMayores][7], blancas));
+    piezasEnTablero.add(new Caballo(casillas[filaMayores][1], blancas));
+    piezasEnTablero.add(new Caballo(casillas[filaMayores][6], blancas));
+    piezasEnTablero.add(new Alfil(casillas[filaMayores][2], blancas));
+    piezasEnTablero.add(new Alfil(casillas[filaMayores][5], blancas));
+    piezasEnTablero.add(new Reina(casillas[filaMayores][3], blancas));
+    piezasEnTablero.add(new Rey(casillas[filaMayores][4], blancas));
+}
+
 
     private void eventoRaton(){
         this.addMouseListener(new MouseAdapter() {
@@ -85,24 +101,10 @@ public class PanelCasillas extends JPanel{
         }
         );
     }
-    
-    private void moverPieza(Casilla origen, Casilla destino){
-        
-        if(destino.obtenerPieza() != null){
-            //Es captura
-            destino.remove(destino.obtenerPieza());
-        }
-        
-        Pieza p = origen.obtenerPieza();
-        origen.remove(p);
-        destino.add(p);
-        p.actualizarDatos(destino);
-        this.repaint();
-    }
-    
+
     private void logicaMovimientoEvento(MouseEvent e){
             casillaClicada = (Casilla)getComponentAt(e.getPoint());
-                //System.out.println("Coordenadas: ( "+casillaClicada.getCoordX()+";"+casillaClicada.getCoordY()+" )");   
+
                 // Ignora clics en casillas vacías si no hay pieza seleccionada
                 if(!(clicado || casillaClicada.obtenerPieza() != null)){
                     //ESTO ES PARA COMPROBAR SI CLICEASTE UNA PIEZA Y ES LA PRIMERA VEZ QUE LO HACES
@@ -126,9 +128,11 @@ public class PanelCasillas extends JPanel{
                         casillaPrimera.pintarme();
                         pintarCasillas(casillaPrimera.obtenerPieza().getMovimientosValidos());
                         casillaPrimera.obtenerPieza().setBeenClicked(false);
-                        moverPieza(casillaPrimera, casillaClicada);
+                        casillaPrimera.obtenerPieza().moverA(casillaClicada);
+                        this.repaint();
                         casillaPrimera = null;
                         clicado = false;
+                        generarMovimietosPiezas();
                         return;
                     }
                     return;
@@ -144,6 +148,13 @@ public class PanelCasillas extends JPanel{
                 }
         
         
+    }
+
+    private void generarMovimietosPiezas(){
+        for(Pieza p: piezasEnTablero){
+            p.resetMovimientosValidos();
+            p.obtenerMovimientos();
+        }
     }
     
     private void deseleccionar(){

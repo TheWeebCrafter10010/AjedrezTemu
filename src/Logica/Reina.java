@@ -9,10 +9,6 @@ import Interfaz.PanelCasillas;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 
-/**
- *
- * @author Usuario
- */
 public class Reina extends Pieza{
 
     public Reina(Casilla casilla, boolean esBlancha) {
@@ -21,6 +17,7 @@ public class Reina extends Pieza{
 
     @Override
     public ImageIcon ponerImagen(boolean esBlanca) {
+
         if(esBlanca){
             return PanelCasillas.imagenesPiezas.get(6);
         }
@@ -29,7 +26,8 @@ public class Reina extends Pieza{
 
     @Override
     public ArrayList<Casilla> obtenerMovimientos() {
-        
+        // La reina combina los movimientos de la torre y el alfil.
+
         Torre.movimientosTorre(this);
         Alfil.movimientosAlfil(this);
         return getListaMovimientos();

@@ -7,9 +7,13 @@ import java.util.ArrayList;
 import javax.swing.ImageIcon;
 
 public class Peon extends Pieza{
+    private boolean capturaEnPaso = false;
 
+    private ArrayList<Casilla> casillasAlPaso = new ArrayList<>();
+    private int direccion;
     public Peon(Casilla casilla, boolean esBlancha) {
         super(casilla, esBlancha);
+        direccion = (getJugador() == 1) ? -1 : (getJugador() == 2) ? 1 : 0;
     }
 
     @Override
@@ -23,88 +27,137 @@ public class Peon extends Pieza{
     @Override
     public ArrayList<Casilla> obtenerMovimientos() {
         ArrayList<Casilla> casillas = getListaMovimientos();
-        
-        if(getJugador() == 1){
-            int y = getCoordY()-1;
-            System.out.println("la coordenada siguiente es:" +y);
-            if (y >=0){
-                System.out.println("ola");
-                int x1= getCoordX()+1;
-                int x2= getCoordX()-1;
+        casillas.clear();
+        if (direccion == 0) return casillas;
 
-                if(x1<8){
-                    int check = detectarPiezaCasilla(PanelCasillas.casillas[y][x1]);
-                    
-                    if(check == -1){
-                        casillas.add(PanelCasillas.casillas[y][x1]);
-                        PanelCasillas.casillas[y][x1].actualizarAmenaza(this);
-                    }
-                    if(check ==0){
-                        PanelCasillas.casillas[y][x1].actualizarAmenaza(this);
-                    }
-
+        if(isCapturaEnPaso()) {
+            System.out.println("Captura en paso activada");
+            for(Casilla c: casillasAlPaso) {
+                if(!c.tengoPieza()){
+                    System.out.println("Agregando casilla de captura en paso: ");
+                    casillas.add(c);
                 }
-                if(x2>=0){
-                    int check = detectarPiezaCasilla(PanelCasillas.casillas[y][x2]);
-                    if(check == -1){
-                        casillas.add(PanelCasillas.casillas[y][x2]);
-                        PanelCasillas.casillas[y][x2].actualizarAmenaza(this);
-                    }
-                    if(check ==0){
-                        PanelCasillas.casillas[y][x2].actualizarAmenaza(this);
-                    }
 
-                }
-                if(!PanelCasillas.casillas[y][getCoordX()].tengoPieza()){
+            }// Reseteamos la captura en paso después de agregar las casillas
+        }
+
+
+        if(getPrimerMovimiento()) {
+            // Si es el primer movimiento, puede avanzar dos casillas
+            int y = getCoordY() + 2 * direccion;
+            if (y >= 0 && y < 8) {
+                if (!PanelCasillas.casillas[y][getCoordX()].tengoPieza()) {
                     casillas.add(PanelCasillas.casillas[y][getCoordX()]);
                 }
-                return casillas;
             }
+        }
+
+        int y = getCoordY() + direccion;
+        if (y < 0 || y >= 8) {
             System.out.println("llegue hasta aqui, no hay movimientos");
             return casillas;
         }
-        
-        if(getJugador() == 2){
-            int y = getCoordY()+1;
-            System.out.println("la coordenada siguiente es:" +y);
-            if (8 >y){
 
-                int x1= getCoordX()+1;
-                int x2= getCoordX()-1;
+        int x = getCoordX();
+        int[] dx = {1, -1};
 
-                if(x1<8){
-                    int check = detectarPiezaCasilla(PanelCasillas.casillas[y][x1]);
-                    
-                    if(check == -1){
-                        casillas.add(PanelCasillas.casillas[y][x1]);
-                        PanelCasillas.casillas[y][x1].actualizarAmenaza(this);
-                    }
-                    if(check ==0){
-                        PanelCasillas.casillas[y][x1].actualizarAmenaza(this);
-                    }
-
+        for (int d : dx) {
+            int nx = x + d;
+            if (nx >= 0 && nx < 8) {
+                int check = detectarPiezaCasilla(PanelCasillas.casillas[y][nx]);
+                if (check == -1) {
+                    casillas.add(PanelCasillas.casillas[y][nx]);
                 }
-                if(x2>=0){
-                    int check = detectarPiezaCasilla(PanelCasillas.casillas[y][x2]);
-                    if(check == -1){
-                        casillas.add(PanelCasillas.casillas[y][x2]);
-                        PanelCasillas.casillas[y][x2].actualizarAmenaza(this);
-                    }
-                    if(check ==0){
-                        PanelCasillas.casillas[y][x2].actualizarAmenaza(this);
-                    }
+                if (check <= 0) {
+                    PanelCasillas.casillas[y][nx].actualizarAmenaza(this);
                 }
-                if(!PanelCasillas.casillas[y][getCoordX()].tengoPieza()){
-                    casillas.add(PanelCasillas.casillas[y][getCoordX()]);
-                }
-                return casillas;
             }
-            System.out.println("llegue hasta aqui, no hay movimientos");
-
-            return casillas;
         }
-        
-        return null;
+
+        if (!PanelCasillas.casillas[y][x].tengoPieza()) {
+            casillas.add(PanelCasillas.casillas[y][x]);
+        }
+
+        return casillas;
+    }
+
+    @Override
+    public void moverA(Casilla destino) {
+        int y = getCoordY();
+        boolean primerMovimiento = getPrimerMovimiento();
+        if(capturaEnPaso){
+            for(Casilla c : casillasAlPaso) {
+                if (c.equals(destino)) {
+                    // Captura en paso
+                    int destinoY = destino.getCoordY()+(direccion*-1);
+                    Casilla casillaCapturada = PanelCasillas.casillas[destinoY][destino.getCoordX()];
+                    casillaCapturada.remove(casillaCapturada.obtenerPieza());
+                    casillasAlPaso.clear();
+                    break;
+                }
+            }
+        }
+        super.moverA(destino);
+
+
+        if(primerMovimiento){
+            int cantidadCasillasAvanzadas = Math.abs(destino.getCoordY() - y);
+            avisarAlDun(cantidadCasillasAvanzadas);
+        }
+        capturaEnPaso = false;// Reseteamos la captura en paso después de mover
+
+
+    }
+
+    @Override
+    public void resetMovimientosValidos() {
+        super.resetMovimientosValidos();
+        casillasAlPaso.clear();
+        capturaEnPaso = false;
+    }
+
+    private void avisarAlDun(int casillasAvanzadas) {
+
+        if (casillasAvanzadas == 2) {
+
+            int[] dx = {1, -1};
+            int x = getCoordX();
+
+            for (int d : dx) {
+                int nx = x + d;
+                if (nx >= 0 && nx < 8) {
+                    Casilla casillaAmenazada = PanelCasillas.casillas[getCoordY()][nx];
+                    if (casillaAmenazada.tengoPieza()) {
+                        Pieza piezaDeAlado = casillaAmenazada.obtenerPieza();
+                        if (piezaDeAlado.getJugador() != getJugador()&& piezaDeAlado instanceof Peon) {
+                            Peon p = (Peon) piezaDeAlado;
+                            System.out.println("Captura en paso activada por: " + p.tipoPieza());
+                            p.setCapturaEnPaso(true);
+                            p.getCasillasAlPaso().add(PanelCasillas.casillas[p.getCoordY()+p.getDireccion()][p.getCoordX()+(d*-1)]);
+
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+
+    public ArrayList<Casilla> getCasillasAlPaso() {
+        return casillasAlPaso;
+    }
+
+
+    public boolean isCapturaEnPaso() {
+        return capturaEnPaso;
+    }
+
+    public int getDireccion() {
+        return direccion;
+    }
+
+    public void setCapturaEnPaso(boolean capturaEnPaso) {
+        this.capturaEnPaso = capturaEnPaso;
     }
 
     @Override

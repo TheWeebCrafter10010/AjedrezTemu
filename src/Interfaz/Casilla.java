@@ -13,7 +13,7 @@ public class Casilla extends JPanel{
     private int coordX;
     private int coordY;
     
-    private boolean amenazado;
+    private boolean[] amenazado = new boolean[2]; //
     private ArrayList<Pieza> piezasQueAmenazan = new ArrayList<>();
     
     private boolean beenClicked;
@@ -36,7 +36,8 @@ public class Casilla extends JPanel{
     }
     
     private PanelCasillas obtenerPadre(){
-        if(this.getParent() instanceof PanelCasillas padre){
+        if(this.getParent() instanceof PanelCasillas){
+            PanelCasillas padre = (PanelCasillas) this.getParent();
             return padre;
         }
         return null;
@@ -44,7 +45,8 @@ public class Casilla extends JPanel{
     
     public Pieza obtenerPieza(){
         for(Component c: this.getComponents()){
-            if(c instanceof Pieza p){
+            if(c instanceof Pieza){
+                Pieza p = (Pieza) c;
                 return p;
             }
             
@@ -74,8 +76,7 @@ public class Casilla extends JPanel{
         setBackground(Color.green);
         colorActual = Color.green;
     }
-    
-    
+
     public void pintarme(Color color){
         setBackground(color);
         colorActual = color;
@@ -83,7 +84,11 @@ public class Casilla extends JPanel{
     
     public void actualizarAmenaza(Pieza p){
         piezasQueAmenazan.add(p);
-        amenazado = true;
+        if(p.getJugador() == 0){
+            amenazado[0] = true;
+        } else {
+            amenazado[1] = true;
+        }
     }
 
     public int getCoordX() {
@@ -101,14 +106,10 @@ public class Casilla extends JPanel{
     public void setCoordY(int coordY) {
         this.coordY = coordY;
     }
-    public boolean isAmenazado() {
-        return amenazado;
+    
+    public boolean isAmenazado(int jugador) {
+        return amenazado[jugador];
     }
 
-    public void setAmenazado(boolean amenazado) {
-        this.amenazado = amenazado;
-    }
-    
-    
-    
+
 }
