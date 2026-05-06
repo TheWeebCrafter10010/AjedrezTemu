@@ -1,8 +1,10 @@
 
-package Logica;
+package Logica.Piezas;
 
 import Interfaz.Casilla;
 import Interfaz.PanelCasillas;
+import Recursos.Prueba;
+
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 
@@ -16,9 +18,9 @@ public class Caballo extends Pieza{
     public ImageIcon ponerImagen(boolean esBlanca) {
         
         if(esBlanca){
-            return PanelCasillas.imagenesPiezas.get(3);
+            return Prueba.imagenesPiezas.get(3);
         }
-        return PanelCasillas.imagenesPiezas.get(-3);
+        return Prueba.imagenesPiezas.get(-3);
     }
 
     @Override

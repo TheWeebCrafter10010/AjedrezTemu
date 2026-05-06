@@ -1,8 +1,10 @@
 
-package Logica;
+package Logica.Piezas;
 
 import Interfaz.Casilla;
 import Interfaz.PanelCasillas;
+import Recursos.Prueba;
+
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 
@@ -19,9 +21,9 @@ public class Peon extends Pieza{
     @Override
     public ImageIcon ponerImagen(boolean esBlanca) {
         if(esBlanca){
-            return PanelCasillas.imagenesPiezas.get(1);
+            return Prueba.imagenesPiezas.get(1);
         }
-        return PanelCasillas.imagenesPiezas.get(-1);
+        return Prueba.imagenesPiezas.get(-1);
     }
 
     @Override
@@ -91,7 +93,7 @@ public class Peon extends Pieza{
                     // Captura en paso
                     int destinoY = destino.getCoordY()+(direccion*-1);
                     Casilla casillaCapturada = PanelCasillas.casillas[destinoY][destino.getCoordX()];
-                    casillaCapturada.remove(casillaCapturada.obtenerPieza());
+                    casillaCapturada.remove(casillaCapturada.getPieza());
                     casillasAlPaso.clear();
                     break;
                 }
@@ -128,7 +130,7 @@ public class Peon extends Pieza{
                 if (nx >= 0 && nx < 8) {
                     Casilla casillaAmenazada = PanelCasillas.casillas[getCoordY()][nx];
                     if (casillaAmenazada.tengoPieza()) {
-                        Pieza piezaDeAlado = casillaAmenazada.obtenerPieza();
+                        Pieza piezaDeAlado = casillaAmenazada.getPieza();
                         if (piezaDeAlado.getJugador() != getJugador()&& piezaDeAlado instanceof Peon) {
                             Peon p = (Peon) piezaDeAlado;
                             System.out.println("Captura en paso activada por: " + p.tipoPieza());

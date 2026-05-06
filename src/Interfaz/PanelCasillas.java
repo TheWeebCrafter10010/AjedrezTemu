@@ -1,10 +1,11 @@
 
 package Interfaz;
 
-import Logica.*;
+import Logica.Juego.IClickListener;
+import Logica.Juego.ITablero;
+import Logica.Piezas.*;
 import Recursos.ImagePieza;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -14,31 +15,57 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
-public class PanelCasillas extends JPanel{
+public class PanelCasillas extends JPanel implements ITablero {
     
     public static Casilla[][] casillas = new Casilla[8][8];
     ArrayList<Pieza> piezasEnTablero = new ArrayList<>();
-    
-    //public static ImageIcon[] imagenes;
-    
-    public static Map<Integer, ImagePieza> imagenesPiezas = new HashMap<>();
-    
-    private boolean clicado;
-    
-    private Casilla casillaClicada;
-    private Casilla casillaPrimera;
+    private IClickListener clickListener;
 
     public PanelCasillas() {
+
+    }
+
+    @Override
+    public void iniciarTablero() {
         setBounds(54, 58, 602, 602);
         setVisible(true);
         setLayout(null);
         generarCasillas();
         Border borde = BorderFactory.createLineBorder(Color.BLACK, 1);
         setBorder(borde);
-        eventoRaton();
+
+        System.out.println("dibujando piezas");
+        generarPiezas(true);
+        generarPiezas(false);
+        System.out.println("piezas dibujadas");
+        this.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e){
+                clickListener.onClick((Casilla)getComponentAt(e.getPoint()));
+            }
+        });
         repaint();
     }
-    
+
+    @Override
+    public void moverPieza(Casilla origen, Casilla destino) {
+        origen.getPieza().moverA(destino);
+        this.repaint();
+    }
+    @Override
+    public ArrayList<Pieza> getPiezasEnTablero() {
+        return piezasEnTablero;
+    }
+
+    @Override
+    public void pintarCasillas(Pieza piezaOrigen){
+        ArrayList<Casilla> casillas = piezaOrigen.getMovimientosValidos();
+        piezaOrigen.getCasillaActual().pintarme(Color.YELLOW);
+         for(Casilla c: casillas){
+            c.pintarme();
+        }
+    }
+
     private void generarCasillas(){
         int x = 0;
         int y = 0;
@@ -55,22 +82,10 @@ public class PanelCasillas extends JPanel{
             x = 0;
             y++;
         }
-       
-    }   
-    
-    public void pintarCasillas(ArrayList<Casilla> casillas){
-        for(Casilla c: casillas){
-            c.pintarme();
-        }
-    }
-    
-    public void agregarPieza(){
-        generarPiezas(true);
-        generarPiezas(false);
-        generarMovimietosPiezas();
+
     }
 
-private void generarPiezas(boolean blancas){
+    private void generarPiezas(boolean blancas){
     int filaPeones = blancas ? 6 : 1;
     int filaMayores = blancas ? 7 : 0;
 
@@ -91,73 +106,9 @@ private void generarPiezas(boolean blancas){
 }
 
 
-    private void eventoRaton(){
-        this.addMouseListener(new MouseAdapter() {
-            
-            @Override
-            public void mousePressed(MouseEvent e){
-                logicaMovimientoEvento(e);
-            }
-        }
-        );
-    }
-
-    private void logicaMovimientoEvento(MouseEvent e){
-            casillaClicada = (Casilla)getComponentAt(e.getPoint());
-
-                // Ignora clics en casillas vacías si no hay pieza seleccionada
-                if(!(clicado || casillaClicada.obtenerPieza() != null)){
-                    //ESTO ES PARA COMPROBAR SI CLICEASTE UNA PIEZA Y ES LA PRIMERA VEZ QUE LO HACES
-                    //PARA QUE PASE A LO SIGUIENTE DEBE SER: -La segunda vez que cliceaste o si cliceaste a una pieza
-                    //Si clicas una casilla vacia no pasa nada
-                    return;
-                }
-                
-                if(clicado){
-                    // Si se clicó la misma casilla: deseleccionar
-                    if(casillaClicada == casillaPrimera){
-                        casillaPrimera.pintarme();
-                        pintarCasillas(casillaPrimera.obtenerPieza().getMovimientosValidos());
-                        casillaPrimera.obtenerPieza().setBeenClicked(false);
-                        clicado=false;
-                        casillaPrimera = null;
-                        return;
-                    }
-                    
-                    if(casillaPrimera.obtenerPieza().getMovimientosValidos().contains(casillaClicada)){
-                        casillaPrimera.pintarme();
-                        pintarCasillas(casillaPrimera.obtenerPieza().getMovimientosValidos());
-                        casillaPrimera.obtenerPieza().setBeenClicked(false);
-                        casillaPrimera.obtenerPieza().moverA(casillaClicada);
-                        this.repaint();
-                        casillaPrimera = null;
-                        clicado = false;
-                        generarMovimietosPiezas();
-                        return;
-                    }
-                    return;
-                }
-                
-                if(casillaClicada.obtenerPieza() != null){
-                    casillaClicada.pintarme(Color.YELLOW);
-                    Pieza p = casillaClicada.obtenerPieza();
-                    pintarCasillas(p.getMovimientosValidos());
-                    casillaPrimera = casillaClicada;
-                    clicado = true;
-                    return;
-                }
-        
-        
-    }
-
-    private void generarMovimietosPiezas(){
-        for(Pieza p: piezasEnTablero){
-            p.resetMovimientosValidos();
-            p.obtenerMovimientos();
-        }
-    }
-    
-    private void deseleccionar(){
-        
+    @Override
+    public void setClickListener(IClickListener clickListener) {
+        this.clickListener = clickListener;
     }
 }
+

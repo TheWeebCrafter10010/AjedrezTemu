@@ -1,7 +1,7 @@
 
 package Interfaz;
 
-import Logica.Pieza;
+import Logica.Piezas.Pieza;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -43,7 +43,7 @@ public class Casilla extends JPanel{
         return null;
     }
     
-    public Pieza obtenerPieza(){
+    public Pieza getPieza(){
         for(Component c: this.getComponents()){
             if(c instanceof Pieza){
                 Pieza p = (Pieza) c;
@@ -56,13 +56,13 @@ public class Casilla extends JPanel{
     
     public boolean tengoPieza(){
         
-        return (obtenerPieza() instanceof Pieza);
+        return (getPieza() instanceof Pieza);
 
     }
     
     public void pintarme(){
         
-        if(obtenerPieza()!= null && colorOriginal == colorActual){
+        if(getPieza()!= null && colorOriginal == colorActual){
             setBackground(Color.red);
             colorActual = Color.red;
             return;
@@ -78,6 +78,11 @@ public class Casilla extends JPanel{
     }
 
     public void pintarme(Color color){
+        if(color == colorActual){
+            setBackground(colorOriginal);
+            colorActual = colorOriginal;
+            return;
+        }
         setBackground(color);
         colorActual = color;
     }

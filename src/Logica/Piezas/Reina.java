@@ -2,10 +2,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package Logica;
+package Logica.Piezas;
 
 import Interfaz.Casilla;
 import Interfaz.PanelCasillas;
+import Recursos.Prueba;
+
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 
@@ -19,9 +21,9 @@ public class Reina extends Pieza{
     public ImageIcon ponerImagen(boolean esBlanca) {
 
         if(esBlanca){
-            return PanelCasillas.imagenesPiezas.get(6);
+            return Prueba.imagenesPiezas.get(6);
         }
-        return PanelCasillas.imagenesPiezas.get(-6);
+        return Prueba.imagenesPiezas.get(-6);
     }
 
     @Override

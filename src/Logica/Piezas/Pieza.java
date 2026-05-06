@@ -1,5 +1,5 @@
 
-package Logica;
+package Logica.Piezas;
 
 import Interfaz.Casilla;
 import Recursos.ImagePieza;
@@ -29,7 +29,7 @@ public abstract class Pieza extends JLabel{
      */
 
     public Pieza(Casilla casilla, boolean esBlancha){
-        
+        this.setBounds(6, 6, 60, 60);
         ImagePieza i = (ImagePieza)ponerImagen(esBlancha);
         setIcon(i);
         setJugador(i.getJugador());
@@ -77,7 +77,7 @@ public abstract class Pieza extends JLabel{
         //1 si es pieza amiga, -1 si es enemiga y 0 si no hay nada en la casilla
 
         if(c.tengoPieza()){
-            Pieza p = c.obtenerPieza();
+            Pieza p = c.getPieza();
             if(this.esAmigo(p)){
                 return 1;
             }
@@ -146,9 +146,9 @@ public abstract class Pieza extends JLabel{
     }
 
     public void moverA(Casilla destino) {
-        if(destino.obtenerPieza() != null){
+        if(destino.getPieza() != null){
             // Es captura
-            destino.remove(destino.obtenerPieza());
+            destino.remove(destino.getPieza());
         }
         this.setPrimerMovimiento(false);
         Casilla origen = casillaActual;

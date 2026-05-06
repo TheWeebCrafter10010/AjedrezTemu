@@ -4,9 +4,11 @@ package Recursos;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.HashMap;
 
 public class Prueba {
-    
+
+    public static HashMap<Integer, ImagePieza> imagenesPiezas = new HashMap<>();
     public void pruebaUrl() throws URISyntaxException{
     
         URL url = darUrl();

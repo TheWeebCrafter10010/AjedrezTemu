@@ -23,7 +23,7 @@ public class ImagePieza extends ImageIcon{
         if(jugador == 2){
             indicePiezas--;
             indice = indicePiezas;
-            PanelCasillas.imagenesPiezas.put(indice, this);
+            Prueba.imagenesPiezas.put(indice, this);
             return;
         }
         if(0>indicePiezas){
@@ -31,7 +31,7 @@ public class ImagePieza extends ImageIcon{
         }
         indicePiezas++;
         indice = indicePiezas;
-        PanelCasillas.imagenesPiezas.put(indice, this);
+        Prueba.imagenesPiezas.put(indice, this);
     }
     
     private void hallarJugador(String ruta){
